@@ -50,11 +50,11 @@ NEXT_PUBLIC_API_URL=http://localhost:8080/api
 
 ## 🛡️ 브랜치 전략
 
-| 브랜치                     | 설명                                |
-|----------------------------|-------------------------------------|
-| `main`                     | 운영 배포 브랜치 (🔒 보호)           |
-| `development`              | 통합 개발 브랜치 (🔒 보호)           |
-| `feat/{ticket-id}/{desc}`  | 기능 단위 브랜치 (`feat/23/login-ui`) |
+| 브랜치                    | 설명                                  |
+| ------------------------- | ------------------------------------- |
+| `main`                    | 운영 배포 브랜치 (🔒 보호)            |
+| `development`             | 통합 개발 브랜치 (🔒 보호)            |
+| `feat/{ticket-id}/{desc}` | 기능 단위 브랜치 (`feat/23/login-ui`) |
 
 > `main`, `development`는 직접 push 금지  
 > 반드시 PR을 통해 병합하며 코드 리뷰 필수
@@ -73,15 +73,16 @@ NEXT_PUBLIC_API_URL=http://localhost:8080/api
 
 커밋 메시지는 **한글**로 작성하고 다음 prefix를 사용합니다:
 
-| Prefix     | 설명                                         |
-|------------|----------------------------------------------|
-| `feat`     | 새로운 기능 추가                             |
-| `fix`      | 버그 수정                                    |
-| `docs`     | 문서 작업 또는 README 수정                   |
-| `refactor` | 코드 리팩토링 (기능 변화 없음)               |
-| `config`   | 설정 파일 변경 (예: tailwind, eslint 등)     |
+| Prefix     | 설명                                     |
+| ---------- | ---------------------------------------- |
+| `feat`     | 새로운 기능 추가                         |
+| `fix`      | 버그 수정                                |
+| `docs`     | 문서 작업 또는 README 수정               |
+| `refactor` | 코드 리팩토링 (기능 변화 없음)           |
+| `config`   | 설정 파일 변경 (예: tailwind, eslint 등) |
 
 예시:
+
 ```bash
 git commit -m "feat: 감정 일기 등록 API 연동"
 ```
@@ -102,24 +103,24 @@ git commit -m "feat: 감정 일기 등록 API 연동"
 
 - `main`, `development` 브랜치 보호 설정:
 
-  - `Allow force pushes` ❌  
-  - `Allow deletions` ❌  
-  - `Require pull request before merging` ✅  
+  - `Allow force pushes` ❌
+  - `Allow deletions` ❌
+  - `Require pull request before merging` ✅
 
-- 레포지토리는 기본 `private` 상태 유지  
+- 레포지토리는 기본 `private` 상태 유지
 - 환경변수 파일은 `.gitignore`로 관리
 
 ---
 
 ## 📚 사용 스택
 
-| 구분        | 기술 스택                                |
-|-------------|-------------------------------------------|
-| 프레임워크   | Next.js 13 (App Router), React 18         |
-| 스타일링     | Tailwind CSS, PostCSS                     |
-| HTTP 통신    | Axios                                     |
-| 개발 환경    | ESLint, Prettier, GitHub Actions (선택)   |
-| 협업 도구    | GitHub, Notion, Figma (필요 시)           |
+| 구분       | 기술 스택                               |
+| ---------- | --------------------------------------- |
+| 프레임워크 | Next.js 13 (App Router), React 18       |
+| 스타일링   | Tailwind CSS, PostCSS                   |
+| HTTP 통신  | Axios                                   |
+| 개발 환경  | ESLint, Prettier, GitHub Actions (선택) |
+| 협업 도구  | GitHub, Notion, Figma (필요 시)         |
 
 ---
 
@@ -136,18 +137,17 @@ git commit -m "feat: 감정 일기 등록 API 연동"
 
 ## 📅 회의 일정 및 협업 규칙
 
-- ✅ **매주**: 각자 개발한 기능 정리 → Notion 업로드  
-- ✅ **모든 팀원**: 서로의 노션 문서를 참고하여 피드백 주고받기  
-- ✅ **2주마다**: 온라인 미팅 진행 (기능 공유 및 피드백)  
-- ✅ **한 달에 1회**: 전체 회의 필수 참석 (중간 회의 불참자 포함)  
+- ✅ **매주**: 각자 개발한 기능 정리 → Notion 업로드
+- ✅ **모든 팀원**: 서로의 노션 문서를 참고하여 피드백 주고받기
+- ✅ **2주마다**: 온라인 미팅 진행 (기능 공유 및 피드백)
+- ✅ **한 달에 1회**: 전체 회의 필수 참석 (중간 회의 불참자 포함)
 
 ---
 
 ## 📞 문의 및 연락
 
-- 팀장: 김도희  
-- GitHub: https://github.com/ICC-SupportHub  
-- Notion: (팀 노션 링크 삽입)  
-- 이메일: example@email.com
+- 팀장: 김도희
+- GitHub: https://github.com/ICC-SupportHub/SupportHub-frontend
+- Notion: https://www.notion.so/222672d5ce4680a0848bf36722bea3aa?v=222672d5ce4680af9968000cb3750e20&source=copy_link
 
 ---
