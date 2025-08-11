@@ -8,7 +8,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { Heart, MessageCircle } from 'lucide-react'
 
-// 감정 원(아바타보다 작게)
 function EmotionCircle({ label }) {
   const smallFont = label.length >= 4
   return (
