@@ -5,5 +5,6 @@ export default function HistoryPage() {
     <div className="flex-1 flex flex-col h-full">
       <EmotionHistory />
     </div>
+    aasdfasdfsad
   )
 }
