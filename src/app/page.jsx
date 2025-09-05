@@ -59,20 +59,6 @@ export default function HomePage() {
 
   return (
     <div className="flex-1 flex flex-col">
-      {/* Header */}
-      <div className="border-b bg-white px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">SupportHub</h1>
-            <p className="text-gray-600">마음을 나누는 AI 감정공감 대화 플랫폼</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <SparklesIcon className="h-5 w-5 text-purple-500" />
-            <span className="text-sm text-gray-600">AI 기반 감정 분석</span>
-          </div>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         <div className="max-w-6xl mx-auto p-6">
@@ -93,7 +79,7 @@ export default function HomePage() {
               <Link href="/ai-chat">
                 {" "}
                 {/* 경로 업데이트 */}
-                <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100 font-semibold px-8">
+                <Button size="lgㅣ" className="bg-white text-purple-600 hover:bg-gray-100 font-semibold px-5 py-3">
                   <MessageSquareIcon className="mr-2 h-5 w-5" />
                   AI와 대화 시작하기
                 </Button>

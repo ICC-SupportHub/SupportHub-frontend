@@ -4,7 +4,17 @@
 
 /* 폰트 지정 */
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #f3e8ff 0%, #ffe4e6 100%);
+}
+
+@layer components {
+  .card-samppong {
+    @apply bg-white/80 rounded-2xl shadow-2xl border-0 p-6 transition-all duration-300 hover:shadow-3xl hover:scale-[1.02];
+  }
+  .btn-samppong {
+    @apply bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-xl shadow-lg px-6 py-2 transition-all duration-200 hover:from-pink-500 hover:to-purple-500 hover:scale-105;
+  }
 }
 
 /* 사용자 정의 유틸리티 */
