@@ -1,161 +1,184 @@
 "use client"
-import { useState } from "react"
-import { Card, CardHeader, CardTitle, CardContent } from "@/app/emergency-support/components/ui/card"
-import { Button } from "@/app/emergency-support/components/ui/button"
-import { Input } from "@/app/emergency-support/components/ui/input"
-import { Badge } from "@/app/emergency-support/components/ui/badge"
-import { MapPinIcon, SearchIcon, PhoneIcon, ClockIcon } from "lucide-react"
+import { useMemo, useState, useEffect, useRef } from "react"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { MapPinIcon, SearchIcon, PhoneIcon, ClockIcon, Copy, InfoIcon } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { toast } from "sonner"
+import type { RegionalGroup } from "@/app/emergency-support/data/regional-centers"
+import { regionalCenters } from "@/app/emergency-support/data/regional-centers"
 
-const regionalCenters = [
-  {
-    region: "서울",
-    centers: [
-      {
-        name: "서울시 자살예방센터",
-        phone: "02-3444-9934",
-        address: "서울시 중구 세종대로 110",
-        hours: "24시간",
-        services: ["자살예방", "위기상담", "사후관리"],
-      },
-      {
-        name: "서울시 정신건강복지센터",
-        phone: "02-3444-9934",
-        address: "서울시 중구 퇴계로 173",
-        hours: "평일 9-18시",
-        services: ["정신건강상담", "치료연계", "재활프로그램"],
-      },
-    ],
-  },
-  {
-    region: "부산",
-    centers: [
-      {
-        name: "부산시 자살예방센터",
-        phone: "051-242-2575",
-        address: "부산시 연제구 중앙대로 1001",
-        hours: "24시간",
-        services: ["자살예방", "위기개입", "유족지원"],
-      },
-    ],
-  },
-  {
-    region: "대구",
-    centers: [
-      {
-        name: "대구시 정신건강복지센터",
-        phone: "053-803-8275",
-        address: "대구시 중구 국채보상로 680",
-        hours: "평일 9-18시",
-        services: ["정신건강상담", "사례관리", "교육프로그램"],
-      },
-    ],
-  },
-]
+// 데이터는 분리된 파일에서 import (전국 17개 시·도 커버)
+// 필요 시 해당 파일만 수정하면 됨
 
 export default function RegionalServices() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [filteredCenters, setFilteredCenters] = useState(regionalCenters)
+  const listTopRef = useRef<HTMLDivElement | null>(null)
+  const MAX_VISIBLE = 4
+  const [expanded, setExpanded] = useState(false)
 
-  const handleSearch = () => {
-    if (!searchTerm.trim()) {
-      setFilteredCenters(regionalCenters)
-      return
-    }
-
-    const filtered = regionalCenters.filter(
-      (region) =>
-        region.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        region.centers.some(
-          (center) =>
-            center.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            center.services.some((service) => service.toLowerCase().includes(searchTerm.toLowerCase())),
-        ),
+  const flat = useMemo(() => {
+    // region 정보를 각 center에 주입해 평탄화
+    return regionalCenters.flatMap((g) =>
+      g.centers.map((c) => ({ ...c, region: g.region }))
     )
-    setFilteredCenters(filtered)
+  }, [])
+
+  const filteredCenters = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase()
+    if (!q) return flat
+    return flat.filter((c) => {
+      const hay = [
+        c.region,
+        c.name,
+        c.phone,
+        c.address,
+        ...(c.features || []),
+        ...(c.keywords || []),
+      ].filter(Boolean).join(" ").toLowerCase()
+      return hay.includes(q)
+    })
+  }, [flat, searchTerm])
+
+  // 검색어가 바뀌면 접은 상태로 초기화
+  useEffect(() => { setExpanded(false) }, [searchTerm])
+
+  const visibleCenters = useMemo(
+    () => (expanded ? filteredCenters : filteredCenters.slice(0, MAX_VISIBLE)),
+    [filteredCenters, expanded]
+  )
+  const hiddenCount = Math.max(0, filteredCenters.length - MAX_VISIBLE)
+
+  const copy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      toast.success("번호가 복사됐어요")
+    } catch {
+      toast.error("복사에 실패했어요")
+    }
   }
 
   const handleCall = (phone: string) => {
-    window.open(`tel:${phone}`)
+    if (!phone) return
+    window.location.href = `tel:${phone.replaceAll(/[^0-9]/g, "")}`
   }
 
   return (
     <Card className="shadow-lg backdrop-blur-sm bg-white/80 dark:bg-slate-800/80 border-0">
-      <CardHeader>
-        <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-          <MapPinIcon className="h-5 w-5 text-red-500" />
-          지역별 전문 상담센터
+      <CardHeader className="flex items-center justify-between">
+        <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-200">
+          거주 지역 전문 상담센터
         </CardTitle>
-        <p className="text-sm text-gray-600 dark:text-gray-400">거주 지역의 전문 상담센터를 찾아보세요.</p>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button type="button" aria-label="안내" className="text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100">
+                <InfoIcon className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs text-sm leading-relaxed">
+              지역별 세부 정보는 기관·지자체 공지에 따라 <b>변동</b>될 수 있어요. 대표번호(1577-0199/129 등)로 연결해 드립니다.
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex gap-2">
           <Input
-            placeholder="지역명 또는 서비스명으로 검색..."
+            placeholder="지역명, 센터명, 키워드로 검색(예: 서울, 위기, 긴급복지)"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+            onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
             className="flex-1"
           />
           <Button
-            onClick={handleSearch}
-            className="bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white"
+            onClick={() => { /* 입력 블러만으로도 필터 반영됨 */ }}
+            variant="outline"
           >
-            <SearchIcon className="h-4 w-4" />
+            <SearchIcon className="mr-2 h-4 w-4" aria-hidden="true" />
+            검색
           </Button>
         </div>
 
-        <div className="space-y-4">
-          {filteredCenters.map((region, regionIndex) => (
-            <div key={regionIndex} className="space-y-3">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                <MapPinIcon className="h-4 w-4 text-red-500" />
-                {region.region}
-              </h3>
-              <div className="grid gap-3 md:grid-cols-2">
-                {region.centers.map((center, centerIndex) => (
-                  <div
-                    key={centerIndex}
-                    className="p-4 border border-slate-200/50 dark:border-slate-600/50 rounded-lg hover:bg-gradient-to-r hover:from-red-50/50 hover:to-rose-50/50 dark:hover:from-slate-700/50 dark:hover:to-slate-600/50 transition-all duration-300"
-                  >
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-1">{center.name}</h4>
-                        <p className="text-sm text-purple-600 font-mono mb-1">{center.phone}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{center.address}</p>
-                        <div className="flex items-center gap-1 mb-2">
-                          <ClockIcon className="h-3 w-3 text-gray-400" />
-                          <span className="text-xs text-gray-500 dark:text-gray-400">{center.hours}</span>
-                        </div>
-                      </div>
-                      <Button
-                        onClick={() => handleCall(center.phone)}
-                        size="sm"
-                        className="bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white"
-                      >
-                        <PhoneIcon className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {center.services.map((service, serviceIndex) => (
-                        <Badge
-                          key={serviceIndex}
-                          variant="secondary"
-                          className="text-xs bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
-                        >
-                          {service}
-                        </Badge>
+        <div ref={listTopRef} className="grid gap-4 md:grid-cols-2">
+          {visibleCenters.map((center, idx) => (
+            <div key={`${center.region}-${center.name}-${idx}`} className="p-4 border border-slate-200/50 dark:border-slate-700/50 rounded-lg bg-white/60 dark:bg-slate-800/60 hover:shadow-sm transition-all">
+              <div className="flex items-center gap-2 mb-2">
+                <MapPinIcon className="h-4 w-4 text-slate-500" aria-hidden="true" />
+                <h3 className="font-semibold text-gray-800 dark:text-gray-200">{center.region}</h3>
+                {center.isNational && (
+                  <Badge variant="secondary" className="ml-2">전국대표</Badge>
+                )}
+              </div>
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="font-medium text-gray-900 dark:text-gray-100">{center.name}</p>
+                  <p className="text-sm text-purple-600 font-mono break-all">{center.phone}</p>
+                  {center.hours && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      <ClockIcon className="inline h-3 w-3 mr-1" aria-hidden="true" />
+                      {center.hours}
+                    </p>
+                  )}
+                  {center.features?.length ? (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {center.features.map((f, i) => (
+                        <Badge key={i} variant="outline">{f}</Badge>
                       ))}
                     </div>
-                  </div>
-                ))}
+                  ) : null}
+                </div>
+                <div className="flex items-center shrink-0">
+                  <Button size="sm" onClick={() => handleCall(center.phone)}>
+                    <PhoneIcon className="mr-2 h-4 w-4" aria-hidden="true" />
+                    전화하기
+                  </Button>
+                  <Button size="sm" variant="outline" className="ml-2" onClick={() => copy(center.phone)}>
+                    <Copy className="mr-2 h-4 w-4" aria-hidden="true" />
+                    복사
+                  </Button>
+                </div>
               </div>
             </div>
           ))}
         </div>
 
+        {/* 더보기 / 접기 */}
+        {hiddenCount > 0 && !expanded && (
+          <div className="text-center">
+            <Button
+              variant="ghost"
+              onClick={() => setExpanded(true)}
+              aria-expanded={expanded}
+            >
+              더보기 (+{hiddenCount})
+            </Button>
+          </div>
+        )}
+        {expanded && filteredCenters.length > MAX_VISIBLE && (
+          <div className="text-center">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setExpanded(false)
+                // 접을 때 리스트 상단으로 부드럽게 복귀
+                listTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+              }}
+              aria-expanded={expanded}
+            >
+              접기
+            </Button>
+          </div>
+        )}
+
         {filteredCenters.length === 0 && (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            검색 결과가 없습니다. 다른 검색어를 시도해보세요.
+            검색 결과가 없습니다. 키워드(예: 위기, 긴급복지, 상담) 또는 지역명(예: 서울/경기/부산…)으로 다시 검색해보세요.
+            <div className="mt-3 text-sm">
+              또는 대표번호: <span className="font-mono">119</span> / <span className="font-mono">112</span> / <span className="font-mono">1577-0199</span> / <span className="font-mono">129</span> / <span className="font-mono">1366</span> / <span className="font-mono">1388</span>
+            </div>
           </div>
         )}
       </CardContent>

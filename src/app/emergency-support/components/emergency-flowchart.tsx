@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
-import { Card, CardHeader, CardTitle, CardContent } from "@/app/emergency-support/components/ui/card"
-import { Button } from "@/app/emergency-support/components/ui/button"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { AlertTriangleIcon, PhoneIcon, MessageSquareIcon, ArrowRightIcon, ExternalLinkIcon } from "lucide-react"
 
 type StepType = "binary" | "recommendation"
