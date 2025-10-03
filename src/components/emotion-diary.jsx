@@ -178,10 +178,16 @@ export default function EmotionDiary() {
   const getEmotionLabel = (emotion) => {
     const labels = {
       happy: '기쁨 😊',
+      joy: '즐거움 😆',
       sad: '슬픔 😢',
+      depression: '우울감 😔',
+      loneliness: '외로움 💙',
       angry: '화남 😠',
-      anxious: '불안 😟',
+      stress: '스트레스 😤',
+      anxiety: '불안감 😟',
+      'self-criticism': '자기비난 😞',
       neutral: '평온 😐',
+      general: '일반 💭',
     }
     return labels[emotion] || '보통 😐'
   }
@@ -194,10 +200,16 @@ export default function EmotionDiary() {
 
   const emotions = [
     { name: 'happy', emoji: '😊', label: '기쁨' },
+    { name: 'joy', emoji: '😆', label: '즐거움' },
     { name: 'sad', emoji: '😢', label: '슬픔' },
+    { name: 'depression', emoji: '😔', label: '우울감' },
+    { name: 'loneliness', emoji: '💙', label: '외로움' },
     { name: 'angry', emoji: '😠', label: '화남' },
-    { name: 'anxious', emoji: '😟', label: '불안' },
+    { name: 'stress', emoji: '😤', label: '스트레스' },
+    { name: 'anxiety', emoji: '😟', label: '불안감' },
+    { name: 'self-criticism', emoji: '😞', label: '자기비난' },
     { name: 'neutral', emoji: '😐', label: '평온' },
+    { name: 'general', emoji: '💭', label: '일반' },
   ]
 
   return (
