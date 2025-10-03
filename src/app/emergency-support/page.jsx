@@ -13,7 +13,12 @@ import {
   HeartIcon,
   HelpCircleIcon,
   RefreshCwIcon,
+  Copy,
+  InfoIcon,
 } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { toast } from "sonner"
 import { useEffect, useState, useRef } from "react"
 import EmergencyFlowchart from "@/app/emergency-support/components/emergency-flowchart"
 import FAQSection from "@/app/emergency-support/components/faq-section"
@@ -31,6 +36,15 @@ const EmergencyPage = () => {
   const [activeTab, setActiveTab] = useState("emergency")
   const [indicatorStyle, setIndicatorStyle] = useState({ width: 0, left: 0 })
   const tabRefs = useRef({})
+
+  const copyNumber = async (n) => {
+    try {
+      await navigator.clipboard.writeText(n)
+      toast.success("번호가 복사됐어요")
+    } catch {
+      toast.error("복사에 실패했어요")
+    }
+  }
 
   const emergencyContacts = [
     {
@@ -493,16 +507,38 @@ const EmergencyPage = () => {
                 <EmergencyFlowchart />
 
                 <Card className="shadow-md backdrop-blur-sm bg-white/60 dark:bg-slate-800/60 border-0">
-                  <CardHeader>
+                  <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-200">
                       24시간 상담 연락처
                     </CardTitle>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            aria-label="법적·의료 안내"
+                            className="inline-flex items-center text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
+                          >
+                            <InfoIcon className="h-5 w-5" aria-hidden="true" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs text-sm leading-relaxed">
+                          <p className="font-semibold mb-1">안내(정보 제공 목적)</p>
+                          <ul className="list-disc pl-4 space-y-1">
+                            <li>본 콘텐츠는 의료·법률적 진단이나 응급 대응을 <b>대체하지 않아요</b>.</li>
+                            <li>생명·신체의 급박한 위험 시 <b>즉시 119</b>, 범죄가 의심되면 <b>112</b>.</li>
+                            <li>상담 중 위치/개인정보 공유는 <b>본인 판단 하에 최소화</b>하세요.</li>
+                            <li>운영시간·대기시간은 기관/지역 사정으로 <b>변동</b>될 수 있어요.</li>
+                          </ul>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {emergencyContacts.map((contact, index) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between p-4 border border-slate-200/50 dark:border-slate-600/50 rounded-lg hover:bg-gradient-to-r hover:from-rose-50/50 hover:to-pink-50/50 dark:hover:from-slate-700/50 dark:hover:to-slate-600/50 transition-all duration-300 ease-in-out transform hover:scale-[1.02] hover:shadow-md"
+                        className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-slate-50 to-white dark:from-slate-800/60 dark:to-slate-800/30 border border-slate-200/50 dark:border-slate-700/50 transition-all duration-300 ease-in-out transform hover:scale-[1.02] hover:shadow-md"
                       >
                         <div className="flex-1">
                           <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-200">{contact.name}</h3>
@@ -520,8 +556,45 @@ const EmergencyPage = () => {
                           )}
                           {contact.type === "전화" ? "전화하기" : "접속하기"}
                         </Button>
+                        <Button
+                          onClick={() => copyNumber(contact.number)}
+                          variant="outline"
+                          className="ml-2"
+                        >
+                          <Copy className="mr-2 h-4 w-4" aria-hidden="true" />
+                          복사
+                        </Button>
                       </div>
                     ))}
+                    {/* 번호 출처 각주 */}
+                    <div className="pt-2 text-xs text-slate-500 dark:text-slate-400">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-1 hover:underline"
+                            aria-label="번호 출처 안내"
+                          >
+                            <InfoIcon className="h-4 w-4" aria-hidden="true" />
+                            출처 보기
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80 text-sm leading-relaxed">
+                          <p className="font-semibold mb-2">주요 번호(요약)</p>
+                          <ul className="space-y-1">
+                            <li><b>119</b> — 화재·구급·구조 긴급신고</li>
+                            <li><b>112</b> — 범죄 긴급신고</li>
+                            <li><b>1577-0199</b> — 정신건강 <b>위기상담전화</b> (24시간)</li>
+                            <li><b>129</b> — <b>보건복지상담센터</b> (긴급복지/학대/복지사각)</li>
+                            <li><b>1366</b> — <b>여성긴급전화</b> (24시간)</li>
+                            <li><b>1388</b> — <b>청소년상담전화</b> / #1388 문자</li>
+                          </ul>
+                          <p className="mt-2 text-[11px] text-slate-500">
+                            안내는 요약이며, 상세 기준·운영은 기관 공지에 따릅니다.
+                          </p>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -603,14 +676,10 @@ const EmergencyPage = () => {
                               <div className="relative inline-block rounded-lg overflow-hidden shadow-lg">
                                 <img
                                   src={animalStates[resource.type]?.imageUrl || "/placeholder.svg"}
+                                  onError={(e) => { e.currentTarget.src = "/placeholder.svg" }}
                                   alt={resource.type === "cat" ? "귀여운 고양이" : "귀여운 강아지"}
                                   className="max-w-full max-h-[80vh] w-auto h-auto object-contain rounded-lg transition-all duration-500"
                                   crossOrigin="anonymous"
-                                  onError={(e) => {
-                                    e.currentTarget.src = `/placeholder.svg?height=300&width=400&text=${
-                                      resource.type === "cat" ? "🐱 Cute Cat" : "🐶 Cute Dog"
-                                    }`
-                                  }}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-lg pointer-events-none"></div>
                               </div>

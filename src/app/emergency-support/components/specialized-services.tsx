@@ -1,8 +1,11 @@
 "use client"
-import { Card, CardHeader, CardTitle, CardContent } from "@/app/emergency-support/components/ui/card"
-import { Button } from "@/app/emergency-support/components/ui/button"
-import { Badge } from "@/app/emergency-support/components/ui/badge"
-import { PhoneIcon, ExternalLinkIcon, UsersIcon, HeartIcon, ShieldIcon, BabyIcon } from "lucide-react"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { PhoneIcon, ExternalLinkIcon, UsersIcon, HeartIcon, ShieldIcon, BabyIcon, Copy, InfoIcon } from "lucide-react"
+import { toast } from "sonner"
 
 const specializedServices = [
   {
@@ -85,6 +88,15 @@ const specializedServices = [
 ]
 
 export default function SpecializedServices() {
+  const copy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      toast.success("번호가 복사됐어요")
+    } catch {
+      toast.error("복사에 실패했어요")
+    }
+  }
+
   const handleCall = (number: string, isWebsite?: boolean) => {
     if (isWebsite || number.startsWith("www")) {
       window.open(`https://${number}`, "_blank")
@@ -94,13 +106,26 @@ export default function SpecializedServices() {
   }
 
   return (
-    <Card className="shadow-lg backdrop-blur-sm bg-white/80 dark:bg-slate-800/80 border-0">
-      <CardHeader>
-        <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-          <UsersIcon className="h-5 w-5 text-red-500" />
-          전문 상담 서비스
-        </CardTitle>
-        <p className="text-sm text-gray-600 dark:text-gray-400">상황별로 특화된 전문 상담 서비스를 안내해드립니다.</p>
+    <Card className="shadow-md backdrop-blur-sm bg-white/60 dark:bg-slate-800/60 border-0">
+      <CardHeader className="flex items-center justify-between">
+        <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-200">전문 상담/지원 기관</CardTitle>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button type="button" aria-label="법적·의료 안내" className="text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100">
+                <InfoIcon className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs text-sm leading-relaxed">
+              <p className="font-semibold mb-1">안내(정보 제공 목적)</p>
+              <ul className="list-disc pl-4 space-y-1">
+                <li>본 콘텐츠는 <b>의료·법률 자문을 대체하지 않아요</b>.</li>
+                <li>급박한 위험은 <b>119/112</b>를 먼저 이용하세요.</li>
+                <li>개인정보·위치 공유는 최소화하고, 기관 안내를 따르세요.</li>
+              </ul>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </CardHeader>
       <CardContent className="space-y-6">
         {specializedServices.map((category, categoryIndex) => (
@@ -126,6 +151,16 @@ export default function SpecializedServices() {
                       className="bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white"
                     >
                       {service.isWebsite ? <ExternalLinkIcon className="h-4 w-4" /> : <PhoneIcon className="h-4 w-4" />}
+                      {service.isWebsite ? "접속하기" : "전화하기"}
+                    </Button>
+                    <Button
+                      onClick={() => copy(service.number)}
+                      size="sm"
+                      variant="outline"
+                      className="ml-2"
+                    >
+                      <Copy className="mr-2 h-4 w-4" aria-hidden="true" />
+                      복사
                     </Button>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{service.description}</p>
@@ -145,6 +180,26 @@ export default function SpecializedServices() {
             </div>
           </div>
         ))}
+        {/* 번호 출처 각주 */}
+        <div className="pt-2 text-xs text-slate-500 dark:text-slate-400">
+          <Popover>
+            <PopoverTrigger asChild>
+              <button type="button" className="inline-flex items-center gap-1 hover:underline" aria-label="번호 출처 안내">
+                <InfoIcon className="h-4 w-4" aria-hidden="true" />
+                출처 보기
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 text-sm leading-relaxed">
+              <ul className="space-y-1">
+                <li><b>1577-0199</b> — 정신건강 <b>위기상담전화</b> (24시간)</li>
+                <li><b>129</b> — <b>보건복지상담센터</b> (긴급복지/학대/복지사각)</li>
+                <li><b>1366</b> — <b>여성긴급전화</b> (24시간)</li>
+                <li><b>1388</b> — <b>청소년상담전화</b> / #1388 문자</li>
+              </ul>
+              <p className="mt-2 text-[11px] text-slate-500">상세 기준·운영은 기관 공지를 따릅니다.</p>
+            </PopoverContent>
+          </Popover>
+        </div>
       </CardContent>
     </Card>
   )

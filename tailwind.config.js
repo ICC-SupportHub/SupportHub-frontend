@@ -1,4 +1,5 @@
 const config = {
+  darkMode: "class",
   content: [
     "./src/app/**/*.{js,jsx,mdx}",
     "./src/components/**/*.{js,jsx,mdx}",
