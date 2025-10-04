@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useState, useEffect, useRef } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
 
 export function SidebarNav({ onCollapseChange, isMobileOpen, onMobileToggle }) {
   const pathname = usePathname()
@@ -30,7 +31,7 @@ export function SidebarNav({ onCollapseChange, isMobileOpen, onMobileToggle }) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
   const userMenuRef = useRef(null)
-  const [currentUser, setCurrentUser] = useState(null)
+  const { user, logout } = useAuth()
 
   // 모바일에서는 외부에서 전달받은 상태를 사용
   const isOpen = isMobile ? isMobileOpen : false
@@ -47,16 +48,14 @@ export function SidebarNav({ onCollapseChange, isMobileOpen, onMobileToggle }) {
     }
   }
 
-  const handleLogout = () => {
-    // 로그아웃 로직 구현
+  const handleLogout = async () => {
     try {
-      localStorage.removeItem('sh_user')
-      localStorage.removeItem('sh_isLoggedIn')
-      localStorage.removeItem('token')
-    } catch (e) {}
-    setCurrentUser(null)
-    setShowUserMenu(false)
-    router.push('/auth/login')
+      await logout()
+      setShowUserMenu(false)
+      router.push('/auth/login')
+    } catch (error) {
+      console.error('로그아웃 실패:', error)
+    }
   }
 
   // 드롭다운 외부 클릭 시 닫기
@@ -76,34 +75,7 @@ export function SidebarNav({ onCollapseChange, isMobileOpen, onMobileToggle }) {
     }
   }, [showUserMenu])
 
-  // 초기 사용자 상태 동기화 및 storage 이벤트 반영
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('sh_user')
-      if (stored) {
-        setCurrentUser(JSON.parse(stored))
-      } else {
-        // 개발 편의를 위한 기본 로그인 상태
-        const devUser = { name: '희도', initials: '희', plan: 'Plus' }
-        localStorage.setItem('sh_user', JSON.stringify(devUser))
-        setCurrentUser(devUser)
-      }
-    } catch {
-      setCurrentUser(null)
-    }
-
-    const onStorage = (e) => {
-      if (e.key === 'sh_user') {
-        try {
-          setCurrentUser(e.newValue ? JSON.parse(e.newValue) : null)
-        } catch {
-          setCurrentUser(null)
-        }
-      }
-    }
-    window.addEventListener('storage', onStorage)
-    return () => window.removeEventListener('storage', onStorage)
-  }, [])
+  // Firebase 인증 상태는 AuthContext에서 관리됨
 
   const mainNavItems = [
     {
@@ -268,7 +240,7 @@ export function SidebarNav({ onCollapseChange, isMobileOpen, onMobileToggle }) {
           className="relative border-t border-gray-200 p-4"
           ref={userMenuRef}
         >
-          {currentUser ? (
+          {user ? (
             <>
               <div
                 className={cn(
@@ -278,20 +250,26 @@ export function SidebarNav({ onCollapseChange, isMobileOpen, onMobileToggle }) {
                 onClick={() => setShowUserMenu(!showUserMenu)}
               >
                 <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500">
-                  <span className="text-sm font-bold text-white">
-                    {currentUser.initials || currentUser.name?.[0] || 'U'}
-                  </span>
+                  {user.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt="프로필"
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-sm font-bold text-white">
+                      {user.displayName?.[0] || user.email?.[0] || 'U'}
+                    </span>
+                  )}
                 </div>
                 {!isCollapsed && (
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-medium text-gray-900">
-                      {currentUser.name || '사용자'}
+                      {user.displayName || user.email || '사용자'}
                     </div>
-                    {currentUser.plan && (
-                      <div className="truncate text-xs text-gray-500">
-                        {currentUser.plan}
-                      </div>
-                    )}
+                    <div className="truncate text-xs text-gray-500">
+                      {user.email}
+                    </div>
                   </div>
                 )}
               </div>
@@ -316,28 +294,25 @@ export function SidebarNav({ onCollapseChange, isMobileOpen, onMobileToggle }) {
               )}
             </>
           ) : (
-            <div
-              className={cn(
-                isCollapsed
-                  ? 'flex flex-col items-center gap-2'
-                  : 'grid grid-cols-2 gap-2'
-              )}
-            >
-              <Link href="/auth/login">
-                <Button
-                  variant="outline"
-                  className={cn(isCollapsed ? 'h-8 w-8 p-0' : 'w-full')}
-                  title="로그인"
-                >
-                  {!isCollapsed ? '로그인' : 'L'}
-                </Button>
-              </Link>
-              {!isCollapsed && (
-                <Link href="/auth/signup">
-                  <Button className="w-full">회원가입</Button>
-                </Link>
-              )}
-            </div>
+            <Link href="/auth/login">
+              <div
+                className={cn(
+                  'flex cursor-pointer items-center rounded-lg p-2 hover:bg-gray-50',
+                  isCollapsed ? 'justify-center' : 'gap-3'
+                )}
+              >
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-100">
+                  <UsersIcon className="h-4 w-4 text-gray-600" />
+                </div>
+                {!isCollapsed && (
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-medium text-gray-900">
+                      로그인
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Link>
           )}
         </div>
       </div>

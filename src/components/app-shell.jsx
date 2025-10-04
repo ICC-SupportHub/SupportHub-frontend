@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { SidebarNav } from '@/components/sidebar-nav'
 import { Button } from '@/components/ui/button'
 import { Toaster } from 'sonner'
@@ -7,6 +8,11 @@ import { cn } from '@/lib/utils'
 
 export function AppShell({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const router = useRouter()
+
+  const handleLoginClick = () => {
+    router.push('/auth/login')
+  }
 
   return (
     <>
@@ -24,6 +30,7 @@ export function AppShell({ children }) {
           variant="outline"
           size="sm"
           className="border-gray-300 text-gray-700"
+          onClick={handleLoginClick}
         >
           로그인
         </Button>
