@@ -1,4 +1,5 @@
 const config = {
+  darkMode: "class",
   content: [
     "./src/app/**/*.{js,jsx,mdx}",
     "./src/components/**/*.{js,jsx,mdx}",
@@ -7,6 +8,17 @@ const config = {
   ],
   theme: {
     extend: {
+      boxshadow: {
+        "3xl": "0 8px 32px 0 rgba(128, 0, 128, 0.18), 0 1.5px 6px 0 rgba(255, 0, 128, 0.10)"
+      },
+      borderRadius: {
+        "xl": "1rem",
+        "2xl": "1.5rem",
+      },
+      colors: {
+        "samppong-purple": "#a21caf",
+        "samppong-pink": "#ec4899",
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
