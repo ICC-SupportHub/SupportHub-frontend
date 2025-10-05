@@ -265,7 +265,7 @@ export default function SignupPage() {
 
             <Button
               type="submit"
-              className="h-12 w-full bg-gray-900 font-medium text-white hover:bg-gray-800"
+              className="h-12 w-full bg-purple-600 font-medium text-white transition-colors duration-200 hover:bg-purple-700"
               disabled={loading}
             >
               {loading ? (
@@ -290,7 +290,7 @@ export default function SignupPage() {
             <Button
               type="button"
               variant="outline"
-              className="h-12 w-full border-gray-300 hover:bg-gray-50"
+              className="h-12 w-full border-gray-300 transition-colors duration-200 hover:bg-gray-50"
               onClick={handleGoogleSignup}
               disabled={loading}
             >

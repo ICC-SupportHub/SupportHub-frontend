@@ -20,6 +20,7 @@ const initialList = {
   savedDiaries: [],
   selectedDiary: null,
   showAll: false,
+  isExpanded: false, // 모바일에서 목록 펼침/접힘 상태
 }
 
 export default function EmotionDiary() {
@@ -215,32 +216,34 @@ export default function EmotionDiary() {
   return (
     <div className="flex h-full flex-1 flex-col">
       {/* Header */}
-      <div className="border-b bg-white px-6 py-4 dark:bg-gray-800">
+      <div className="border-b bg-white px-4 py-3 dark:bg-gray-800 md:px-6 md:py-4">
         <div className="flex items-center gap-3">
-          <CalendarIcon className="h-6 w-6 text-purple-600" />
+          <CalendarIcon className="h-5 w-5 text-purple-600 md:h-6 md:w-6" />
           <div>
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-white md:text-xl">
               감정 일기
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{today}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 md:text-sm">
+              {today}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-auto">
-        <div className="flex h-full">
+        <div className="flex h-full flex-col md:flex-row">
           {/* 일기 작성 영역 */}
-          <div className="flex-1 overflow-auto p-6">
-            <div className="mx-auto max-w-2xl space-y-6">
+          <div className="flex-1 overflow-auto p-4 md:p-6">
+            <div className="mx-auto max-w-2xl space-y-4 md:space-y-6">
               <div>
                 <Label
                   htmlFor="emotion-select"
-                  className="mb-3 block text-base"
+                  className="mb-3 block text-sm md:text-base"
                 >
                   오늘의 감정은 어떤가요? (최대 3개까지 선택 가능)
                 </Label>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-2 md:gap-3">
                   {emotions.map((emotion) => (
                     <Button
                       key={emotion.name}
@@ -283,7 +286,7 @@ export default function EmotionDiary() {
                           }
                         })
                       }}
-                      className={`flex h-auto w-24 flex-col items-center justify-center p-4 text-lg ${
+                      className={`flex h-auto w-20 flex-col items-center justify-center p-3 text-lg md:w-24 md:p-4 ${
                         editor.selectedEmotions.includes(emotion.name)
                           ? 'bg-purple-500 text-white hover:bg-purple-600'
                           : editor.selectedEmotions.length >= 3
@@ -291,14 +294,21 @@ export default function EmotionDiary() {
                             : 'border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800'
                       }`}
                     >
-                      <span className="mb-1 text-3xl">{emotion.emoji}</span>
-                      <span className="text-sm">{emotion.label}</span>
+                      <span className="mb-1 text-2xl md:text-3xl">
+                        {emotion.emoji}
+                      </span>
+                      <span className="text-xs md:text-sm">
+                        {emotion.label}
+                      </span>
                     </Button>
                   ))}
                 </div>
               </div>
               <div>
-                <Label htmlFor="diary-entry" className="mb-3 block text-base">
+                <Label
+                  htmlFor="diary-entry"
+                  className="mb-3 block text-sm md:text-base"
+                >
                   오늘 하루를 기록해 보세요.
                 </Label>
                 <Textarea
@@ -314,7 +324,7 @@ export default function EmotionDiary() {
                       editingDiary: prev.editingDiary,
                     }))
                   }}
-                  className="min-h-[200px] text-base focus-visible:ring-purple-500"
+                  className="min-h-[150px] text-[15px] focus-visible:ring-purple-500 md:min-h-[200px] md:text-base"
                 />
               </div>
               {(() => {
@@ -345,18 +355,19 @@ export default function EmotionDiary() {
                     <p className="leading-relaxed">{editor.aiFeedback}</p>
                   </div>
                 )}
-              <div className="flex justify-between">
+              <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
                 <Button
                   variant="outline"
                   onClick={handleNewDiary}
                   disabled={editor.isLoading}
+                  className="h-11 w-full sm:w-auto md:h-10"
                 >
                   새 일기 작성
                 </Button>
                 <Button
                   onClick={handleSaveDiary}
                   disabled={editor.isLoading}
-                  className="bg-purple-600 px-8 hover:bg-purple-700"
+                  className="h-11 w-full bg-purple-600 px-6 hover:bg-purple-700 sm:w-auto md:h-10 md:px-8"
                 >
                   {editor.isLoading ? (
                     <>
@@ -374,11 +385,28 @@ export default function EmotionDiary() {
           </div>
 
           {/* 일기 목록 영역 */}
-          <div className="w-80 border-l bg-gray-50 p-4 dark:bg-gray-900">
-            <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              저장된 일기
-            </h3>
-            <div className="space-y-3">
+          <div className="w-full border-t bg-gray-50 p-4 dark:bg-gray-900 md:w-80 md:border-l md:border-t-0">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white md:text-lg">
+                저장된 일기
+                <span className="ml-2 text-sm font-normal text-gray-500">
+                  ({list.savedDiaries.length})
+                </span>
+              </h3>
+              <button
+                onClick={() =>
+                  setList((prev) => ({ ...prev, isExpanded: !prev.isExpanded }))
+                }
+                className="text-sm text-purple-600 hover:text-purple-700 md:hidden"
+              >
+                {list.isExpanded ? '접기 ▲' : '펼치기 ▼'}
+              </button>
+            </div>
+
+            {/* 모바일: isExpanded가 true일 때만 표시, PC: 항상 표시 */}
+            <div
+              className={`space-y-3 ${list.isExpanded ? 'block' : 'hidden'} md:block`}
+            >
               {list.savedDiaries.length === 0 ? (
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   아직 저장된 일기가 없습니다.
@@ -430,10 +458,11 @@ export default function EmotionDiary() {
               )}
             </div>
 
+            {/* PC용 더보기 버튼 */}
             {list.savedDiaries.length > 3 && (
               <Button
                 variant="ghost"
-                className="mt-2 w-full"
+                className="mt-2 hidden w-full md:flex"
                 onClick={() =>
                   setList((prev) => ({ ...prev, showAll: !prev.showAll }))
                 }

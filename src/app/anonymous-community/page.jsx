@@ -252,18 +252,18 @@ export default function Page() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-6">
+    <div className="mx-auto max-w-2xl px-4 py-4 md:px-4 md:py-6">
       {/* 헤더 & 정렬 */}
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">익명 커뮤니티</h1>
+      <div className="mb-4 flex items-center justify-between md:mb-4">
+        <h1 className="text-xl font-semibold md:text-2xl">익명 커뮤니티</h1>
         <div className="relative">
           <Button
             variant="outline"
             onClick={() => setShowSortPopup((v) => !v)}
-            className="min-w-[96px] justify-between"
+            className="h-9 min-w-[80px] justify-between text-sm md:h-10 md:min-w-[96px] md:text-sm"
           >
             {sortType}
-            <span className="ml-2">▾</span>
+            <span className="ml-1 md:ml-2">▾</span>
           </Button>
           {showSortPopup && (
             <div className="absolute right-0 z-10 mt-2 w-36 rounded-xl border bg-white p-1 shadow">
@@ -301,21 +301,21 @@ export default function Page() {
       </div>
 
       {/* 글쓰기 */}
-      <Card className="mb-6">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">감정 나누기</CardTitle>
+      <Card className="mb-4 md:mb-6">
+        <CardHeader className="px-4 pb-2 pt-4 md:px-6 md:pt-6">
+          <CardTitle className="text-base md:text-base">감정 나누기</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 px-4 pb-4 md:px-6 md:pb-6">
           <div className="flex flex-wrap items-center gap-2">
             {EMOTIONS.map((emo) => (
               <button
                 key={emo}
                 onClick={() => setSelectedEmotion(emo)}
-                className={`rounded-full border px-3 py-1 text-sm ${
+                className={`rounded-full border px-3 py-1.5 text-sm md:py-1 ${
                   selectedEmotion === emo
                     ? 'border-neutral-800'
                     : 'border-neutral-300'
-                }`}
+                } transition-transform active:scale-95`}
                 aria-pressed={selectedEmotion === emo}
               >
                 {emo}
@@ -326,9 +326,15 @@ export default function Page() {
             placeholder="지금 마음을 적어보세요..."
             value={postContent}
             onChange={(e) => setPostContent(e.target.value)}
+            className="min-h-[100px] text-sm md:min-h-[120px] md:text-base"
           />
           <div className="flex justify-end">
-            <Button onClick={handleCreatePost}>올리기</Button>
+            <Button
+              onClick={handleCreatePost}
+              className="h-10 px-6 text-sm md:h-10 md:px-6 md:text-base"
+            >
+              올리기
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -350,25 +356,24 @@ export default function Page() {
         ) : (
           posts.map((post) => (
             <Card key={post.id} className="overflow-hidden">
-              <CardHeader className="pb-2">
+              <CardHeader className="px-4 pb-2 pt-4 md:px-6 md:pt-6">
                 <div className="flex items-start justify-between">
                   {/* 왼쪽: 아바타 + 감정 원 */}
-                  <div className="mt-0.5 flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback>AN</AvatarFallback>
+                  <div className="mt-0.5 flex items-center gap-2 md:gap-3">
+                    <Avatar className="h-9 w-9 md:h-10 md:w-10">
+                      <AvatarFallback className="text-sm">AN</AvatarFallback>
                     </Avatar>
                     <EmotionCircle label={post.emotion} />
                   </div>
 
                   {/* 오른쪽: 시간 + 삭제하기 */}
                   <div className="flex flex-col items-end gap-1">
-                    <span className="text-sm text-neutral-500">
+                    <span className="text-xs text-neutral-500 md:text-sm">
                       {post.time}
                     </span>
                     <Button
                       variant="ghost"
-                      size="sm"
-                      className="h-7 px-2 text-xs text-red-600 hover:text-red-700"
+                      className="h-7 px-2 text-xs text-red-600 hover:text-red-700 md:h-7 md:px-2 md:text-xs"
                       onClick={() => handleDeletePost(post.id)}
                     >
                       삭제하기
@@ -377,8 +382,8 @@ export default function Page() {
                 </div>
               </CardHeader>
 
-              <CardContent className="space-y-3">
-                <p className="whitespace-pre-wrap text-[15px] leading-6 text-neutral-800">
+              <CardContent className="space-y-3 px-4 pb-4 md:px-6 md:pb-6">
+                <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-neutral-800 md:text-[15px]">
                   {post.content}
                 </p>
 
@@ -386,7 +391,7 @@ export default function Page() {
                 <div className="mt-1 flex items-center gap-4">
                   <button
                     onClick={() => handleLike(post.id)}
-                    className={`flex items-center gap-1 text-sm transition ${
+                    className={`flex items-center gap-1 text-sm transition active:scale-95 ${
                       post.liked
                         ? 'text-red-600'
                         : 'text-neutral-600 hover:text-neutral-800'
@@ -437,8 +442,12 @@ export default function Page() {
                         handleAddComment(post.id)
                       }
                     }}
+                    className="h-10 text-sm md:h-10 md:text-base"
                   />
-                  <Button size="sm" onClick={() => handleAddComment(post.id)}>
+                  <Button
+                    className="h-10 text-sm md:h-10 md:text-base"
+                    onClick={() => handleAddComment(post.id)}
+                  >
                     등록
                   </Button>
                 </div>

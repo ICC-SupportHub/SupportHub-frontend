@@ -75,25 +75,30 @@ export const AuthProvider = ({ children }) => {
 
   // 인증 상태 변경 감지
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user)
-      setLoading(false)
+    try {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        setUser(user)
+        setLoading(false)
 
-      // localStorage에 사용자 정보 저장
-      if (user) {
-        const userData = {
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
+        // localStorage에 사용자 정보 저장
+        if (user) {
+          const userData = {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+          }
+          localStorage.setItem('sh_user', JSON.stringify(userData))
+        } else {
+          localStorage.removeItem('sh_user')
         }
-        localStorage.setItem('sh_user', JSON.stringify(userData))
-      } else {
-        localStorage.removeItem('sh_user')
-      }
-    })
+      })
 
-    return () => unsubscribe()
+      return () => unsubscribe()
+    } catch (error) {
+      console.error('Firebase auth error:', error)
+      setLoading(false)
+    }
   }, [])
 
   const value = {

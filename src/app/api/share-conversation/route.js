@@ -1,4 +1,4 @@
-import { sharedConversations } from "./sharedConversations"
+import { sharedConversations } from "../sharedConversations"
 
 export async function POST(req) {
   try {

@@ -176,43 +176,47 @@ export default function SpecializedServices() {
               {category.services.map((service, serviceIndex) => (
                 <div
                   key={serviceIndex}
-                  className="flex transform items-center justify-between rounded-lg border border-slate-200/50 bg-gradient-to-r from-slate-50 to-white p-4 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md dark:border-slate-700/50 dark:from-slate-800/60 dark:to-slate-800/30"
+                  className="flex transform flex-col gap-3 rounded-lg border border-slate-200/50 bg-gradient-to-r from-slate-50 to-white p-4 transition-all duration-300 ease-in-out hover:scale-[1.01] hover:shadow-md dark:border-slate-700/50 dark:from-slate-800/60 dark:to-slate-800/30 md:flex-row md:items-center md:justify-between md:hover:scale-[1.02]"
                 >
                   <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                    <h4 className="text-base font-semibold text-gray-800 dark:text-gray-200 md:text-lg">
                       {service.name}
                     </h4>
-                    <p className="whitespace-pre-line text-gray-600 dark:text-gray-400">
+                    <p className="whitespace-pre-line text-sm text-gray-600 dark:text-gray-400 md:text-base">
                       {service.description}
                     </p>
                     <p className="font-mono text-sm text-purple-600">
                       {service.number}
                     </p>
                   </div>
-                  <Button
-                    onClick={() =>
-                      handleCall(service.number, service.isWebsite)
-                    }
-                    className="transform bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-md transition-all duration-300 hover:scale-105 hover:from-red-600 hover:to-rose-600 hover:shadow-lg"
-                  >
-                    {service.isWebsite ? (
-                      <ExternalLinkIcon
-                        className="mr-2 h-4 w-4"
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <PhoneIcon className="mr-2 h-4 w-4" aria-hidden="true" />
-                    )}
-                    {service.isWebsite ? '접속하기' : '전화하기'}
-                  </Button>
-                  <Button
-                    onClick={() => copy(service.number)}
-                    variant="outline"
-                    className="ml-2"
-                  >
-                    <Copy className="mr-2 h-4 w-4" aria-hidden="true" />
-                    복사
-                  </Button>
+                  <div className="flex flex-col gap-2 sm:flex-row md:ml-4">
+                    <Button
+                      onClick={() =>
+                        handleCall(service.number, service.isWebsite)
+                      }
+                      className="transform bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-md transition-all duration-300 hover:scale-105 hover:from-red-600 hover:to-rose-600 hover:shadow-lg"
+                    >
+                      {service.isWebsite ? (
+                        <ExternalLinkIcon
+                          className="mr-2 h-4 w-4"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <PhoneIcon
+                          className="mr-2 h-4 w-4"
+                          aria-hidden="true"
+                        />
+                      )}
+                      {service.isWebsite ? '접속하기' : '전화하기'}
+                    </Button>
+                    <Button
+                      onClick={() => copy(service.number)}
+                      variant="outline"
+                    >
+                      <Copy className="mr-2 h-4 w-4" aria-hidden="true" />
+                      복사
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

@@ -145,7 +145,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="h-12 w-full bg-gray-900 font-medium text-white hover:bg-gray-800"
+              className="h-12 w-full bg-purple-600 font-medium text-white transition-colors duration-200 hover:bg-purple-700"
               disabled={loading}
             >
               {loading ? (
@@ -169,7 +169,7 @@ export default function LoginPage() {
           <Button
             type="button"
             variant="outline"
-            className="h-12 w-full border-gray-300 hover:bg-gray-50"
+            className="h-12 w-full border-gray-300 transition-colors duration-200 hover:bg-gray-50"
             onClick={handleGoogleLogin}
             disabled={loading}
           >
@@ -204,13 +204,16 @@ export default function LoginPage() {
               계정이 없으신가요?{' '}
               <Link
                 href="/auth/signup"
-                className="font-medium text-purple-600 hover:text-purple-700"
+                className="font-medium text-purple-600 transition-colors duration-200 hover:text-purple-700"
               >
                 회원가입
               </Link>
             </p>
             <p className="text-sm">
-              <Link href="#" className="text-gray-600 hover:text-gray-700">
+              <Link
+                href="#"
+                className="text-gray-600 transition-colors duration-200 hover:text-gray-700"
+              >
                 비밀번호를 잊으셨나요?
               </Link>
             </p>

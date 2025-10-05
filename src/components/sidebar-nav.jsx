@@ -20,11 +20,11 @@ import {
   ChevronLeftIcon,
   LogOutIcon,
 } from 'lucide-react'
-import { useIsMobile } from '@/hooks/use-mobile'
+import { useIsMobile } from '@/components/ui/use-mobile'
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 
-export function SidebarNav({ onCollapseChange, isMobileOpen, onMobileToggle }) {
+export function SidebarNav({ onCollapseChange, isMobileOpen, onMobileClose }) {
   const pathname = usePathname()
   const router = useRouter()
   const isMobile = useIsMobile()
@@ -33,13 +33,10 @@ export function SidebarNav({ onCollapseChange, isMobileOpen, onMobileToggle }) {
   const userMenuRef = useRef(null)
   const { user, logout } = useAuth()
 
-  // 모바일에서는 외부에서 전달받은 상태를 사용
-  const isOpen = isMobile ? isMobileOpen : false
-
   const handleCollapseToggle = () => {
     if (isMobile) {
-      // 모바일에서는 사이드바 열기/닫기
-      onMobileToggle?.(!isOpen)
+      // 모바일에서는 사이드바 닫기
+      onMobileClose?.()
     } else {
       // 데스크톱에서는 사이드바 축소/확장
       const newCollapsed = !isCollapsed
@@ -127,10 +124,10 @@ export function SidebarNav({ onCollapseChange, isMobileOpen, onMobileToggle }) {
   return (
     <>
       {/* Mobile Overlay */}
-      {isMobile && isOpen && (
+      {isMobile && isMobileOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black bg-opacity-50"
-          onClick={() => onMobileToggle(false)}
+          className="fixed inset-0 z-30 bg-black/50 transition-opacity duration-300"
+          onClick={onMobileClose}
         />
       )}
 
@@ -139,11 +136,11 @@ export function SidebarNav({ onCollapseChange, isMobileOpen, onMobileToggle }) {
         className={cn(
           'relative flex h-full flex-col border-r border-gray-200 bg-white transition-all duration-300',
           isMobile
-            ? 'fixed left-0 top-0 z-40 w-64 transform transition-transform duration-300'
+            ? 'fixed left-0 top-0 z-40 h-screen w-72 transform shadow-2xl transition-transform duration-300'
             : isCollapsed
               ? 'w-16'
               : 'w-64',
-          isMobile && !isOpen && '-translate-x-full'
+          isMobile && !isMobileOpen && '-translate-x-full'
         )}
       >
         {/* Header */}
@@ -183,7 +180,7 @@ export function SidebarNav({ onCollapseChange, isMobileOpen, onMobileToggle }) {
           )}
 
           {/* New Chat Button */}
-          <Link href="/ai-chat">
+          <Link href="/ai-chat" onClick={() => isMobile && onMobileClose?.()}>
             <Button
               className={cn(
                 'h-9 border border-gray-200 bg-gray-50 font-medium text-gray-700 hover:bg-gray-100',
@@ -210,7 +207,11 @@ export function SidebarNav({ onCollapseChange, isMobileOpen, onMobileToggle }) {
               const Icon = item.icon
               const isActive = pathname === item.href
               return (
-                <Link key={item.href} href={item.href}>
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => isMobile && onMobileClose?.()}
+                >
                   <Button
                     variant="ghost"
                     className={cn(
@@ -294,7 +295,10 @@ export function SidebarNav({ onCollapseChange, isMobileOpen, onMobileToggle }) {
               )}
             </>
           ) : (
-            <Link href="/auth/login">
+            <Link
+              href="/auth/login"
+              onClick={() => isMobile && onMobileClose?.()}
+            >
               <div
                 className={cn(
                   'flex cursor-pointer items-center rounded-lg p-2 hover:bg-gray-50',

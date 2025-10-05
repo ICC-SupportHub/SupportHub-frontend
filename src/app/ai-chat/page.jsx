@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { toast } from '@/hooks/use-toast'
+import { toast } from '@/components/ui/use-toast'
 import {
   SendIcon,
   BotIcon,
@@ -24,7 +24,7 @@ import {
   BrainIcon,
 } from 'lucide-react'
 
-export default function ChatPage() {
+function ChatPageContent() {
   const scrollAreaRef = useRef(null)
   const inputRef = useRef(null)
   const searchParams = useSearchParams()
@@ -330,19 +330,19 @@ export default function ChatPage() {
   return (
     <div className="flex h-full flex-1 flex-col">
       {/* Header */}
-      <div className="border-b bg-white px-6 py-4 dark:bg-gray-800">
+      <div className="border-b bg-white px-4 py-3 dark:bg-gray-800 md:px-6 md:py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-8 w-8">
+          <div className="flex items-center gap-2 md:gap-3">
+            <Avatar className="h-9 w-9 md:h-8 md:w-8">
               <AvatarFallback className="bg-purple-100 text-purple-600">
-                <BotIcon className="h-4 w-4" />
+                <BotIcon className="h-4 w-4 md:h-4 md:w-4" />
               </AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="font-semibold text-gray-900 dark:text-white">
+              <h1 className="text-base font-semibold text-gray-900 dark:text-white md:text-base">
                 감정 공감 AI
               </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-500 dark:text-gray-400 md:text-sm">
                 {isLoading ? '생각하는 중...' : '당신의 마음을 이해합니다'}
               </p>
             </div>
@@ -353,11 +353,10 @@ export default function ChatPage() {
             <DialogTrigger asChild>
               <Button
                 variant="outline"
-                size="sm"
-                className="flex items-center gap-2 bg-transparent"
+                className="flex h-9 items-center gap-1 bg-transparent px-2.5 text-xs md:h-9 md:gap-2 md:px-4 md:text-sm"
               >
                 <ShareIcon className="h-4 w-4" />
-                대화 공유
+                <span className="hidden sm:inline">대화 공유</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
@@ -407,14 +406,14 @@ export default function ChatPage() {
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 px-6" ref={scrollAreaRef}>
-        <div className="mx-auto max-w-3xl space-y-6 py-6">
+      <ScrollArea className="flex-1 px-4 md:px-6" ref={scrollAreaRef}>
+        <div className="mx-auto max-w-3xl space-y-4 py-4 md:space-y-6 md:py-6">
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex gap-4 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
+              className={`flex gap-2 md:gap-4 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
             >
-              <Avatar className="h-8 w-8 flex-shrink-0">
+              <Avatar className="h-8 w-8 flex-shrink-0 md:h-8 md:w-8">
                 <AvatarFallback
                   className={
                     message.role === 'user'
@@ -433,13 +432,13 @@ export default function ChatPage() {
                 className={`max-w-[80%] flex-1 ${message.role === 'user' ? 'text-right' : ''}`}
               >
                 <div
-                  className={`inline-block rounded-2xl p-4 ${
+                  className={`inline-block rounded-xl p-3 md:rounded-2xl md:p-4 ${
                     message.role === 'user'
                       ? 'bg-blue-500 text-white'
                       : 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-white'
                   }`}
                 >
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                  <p className="whitespace-pre-wrap text-[15px] leading-relaxed md:text-sm">
                     {message.content}
                   </p>
                 </div>
@@ -456,13 +455,13 @@ export default function ChatPage() {
             </div>
           ))}
           {isLoading && (
-            <div className="flex gap-4">
+            <div className="flex gap-2 md:gap-4">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-purple-100 text-purple-600">
                   <BotIcon className="h-4 w-4" />
                 </AvatarFallback>
               </Avatar>
-              <div className="rounded-2xl bg-gray-100 p-4 dark:bg-gray-700">
+              <div className="rounded-xl bg-gray-100 p-3 dark:bg-gray-700 md:rounded-2xl md:p-4">
                 <div className="flex space-x-1">
                   <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400"></div>
                   <div
@@ -481,30 +480,29 @@ export default function ChatPage() {
       </ScrollArea>
 
       {/* Input */}
-      <div className="border-t bg-white p-6 dark:bg-gray-800">
+      <div className="border-t bg-white p-4 dark:bg-gray-800 md:p-6">
         <div className="mx-auto max-w-3xl">
-          <form onSubmit={handleSubmit} className="flex gap-4">
+          <form onSubmit={handleSubmit} className="flex gap-2 md:gap-4">
             <Input
               ref={inputRef}
               type="text"
               placeholder="메시지를 입력하세요..."
               value={input}
               onChange={handleUserInput}
-              className="h-12 flex-1 text-base"
+              className="h-11 flex-1 text-sm md:h-12 md:text-base"
               disabled={isLoading}
             />
             <Button
               type="submit"
-              size="lg"
               disabled={!input.trim() || isLoading}
-              className="bg-purple-600 px-6 hover:bg-purple-700"
+              className="h-11 bg-purple-600 px-4 hover:bg-purple-700 md:h-12 md:px-6"
             >
-              <SendIcon className="h-4 w-4" />
+              <SendIcon className="h-4 w-4 md:h-4 md:w-4" />
             </Button>
           </form>
 
           {/* Action Buttons */}
-          <div className="mt-4 flex items-center justify-between">
+          <div className="mt-3 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center sm:gap-4 md:mt-4">
             <p className="text-xs text-gray-500">
               AI는 실수할 수 있습니다. 심각한 상황에서는 전문가의 도움을
               받으세요.
@@ -513,7 +511,6 @@ export default function ChatPage() {
             {/* Diary Button */}
             <Button
               variant="outline"
-              size="sm"
               onClick={() => {
                 // 대화 내용을 감정 일기 페이지로 전달
                 const lastUserMsg = [...messages]
@@ -535,7 +532,7 @@ export default function ChatPage() {
 
                 router.push(`/emotion-diary?${params.toString()}`)
               }}
-              className="flex items-center gap-2"
+              className="flex h-10 w-full items-center gap-1.5 text-xs sm:w-auto md:h-9 md:gap-2 md:text-sm"
             >
               <BookOpenIcon className="h-4 w-4" />
               감정 일기에 저장
@@ -544,5 +541,13 @@ export default function ChatPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ChatPageContent />
+    </Suspense>
   )
 }
